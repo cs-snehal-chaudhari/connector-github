@@ -228,9 +228,6 @@ def update_clone_repository(config, params):
                         continue
                     os.remove(dst_file)
                 shutil.move(src_file, dst_dir)
-        '''get_files = os.listdir(file_source)
-        for g in get_files:
-            os.replace(file_source + g, file_destination + g)'''
         return {'status': 'finish'}
     except Exception as err:
         raise ConnectorError(err)
