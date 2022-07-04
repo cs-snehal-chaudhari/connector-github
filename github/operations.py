@@ -61,8 +61,10 @@ def create_organization_repository(config, params):
         params.update(params.get('other_fields'))
         del params['other_fields']
     payload = {k: v for k, v in params.items() if v is not None and v != '' and v != {} and v != [] and k != 'org'}
-    return github.make_request(endpoint='orgs/{0}/repos'.format(params.get('org')), method='POST',
-                               data=json.dumps(payload))
+    response = github.make_request(endpoint='orgs/{0}/repos'.format(params.get('org')), method='POST',
+                                   data=json.dumps(payload))
+    create_readme_file(config, params)
+    return response
 
 
 def list_organization_repositories(config, params):
@@ -107,6 +109,15 @@ def create_user_repository(config, params):
     return response
 
 
+def create_repository_using_template(config, params):
+    github = GitHub(config)
+    payload = {k: v for k, v in params.items() if
+               v is not None and v != '' and v != {} and v != [] and k not in ['template_owner', 'template_repo']}
+    return github.make_request(
+        endpoint='repos/{0}/{1}/generate'.format(params.get('template_owner'), params.get('template_repo')),
+        method='POST', data=json.dumps(payload))
+
+
 def list_user_repositories(config, params):
     github = GitHub(config)
     query_params = {k: v for k, v in params.items() if
@@ -123,6 +134,16 @@ def update_repository(config, params):
                v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'repo']}
     return github.make_request(endpoint='repos/{0}/{1}'.format(params.get('owner'), params.get('repo')),
                                method='PATCH', data=json.dumps(payload))
+
+
+def add_repository_collaborator(config, params):
+    github = GitHub(config)
+    payload = {k: v for k, v in params.items() if
+               v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'repo', 'username']}
+    return github.make_request(
+        endpoint='repos/{0}/{1}/collaborators/{2}'.format(params.get('owner'), params.get('repo'),
+                                                          params.get('username')),
+        method='PUT', data=json.dumps(payload))
 
 
 def delete_repository(config, params):
@@ -287,6 +308,14 @@ def create_pull_request(config, params):
                                endpoint='repos/{0}/{1}/pulls'.format(params.get('owner'), params.get('repo')))
 
 
+def list_pull_request(config, params):
+    github = GitHub(config)
+    qyery_params = {k: v for k, v in params.items() if
+                    v is not None and v != '' and v != {} and v != [] and k not in ['owner', 'repo']}
+    return github.make_request(params=qyery_params,
+                               endpoint='repos/{0}/{1}/pulls'.format(params.get('owner'), params.get('repo')))
+
+
 def add_reviewers(config, params):
     github = GitHub(config)
     payload = {k: v for k, v in params.items() if
@@ -387,8 +416,10 @@ operations = {
     'list_fork_repositories': list_fork_repositories,
     'list_organization_repositories': list_organization_repositories,
     'create_user_repository': create_user_repository,
+    'create_repository_using_template': create_repository_using_template,
     'list_user_repositories': list_user_repositories,
     'update_repository': update_repository,
+    'add_repository_collaborator': add_repository_collaborator,
     'delete_repository': delete_repository,
     'get_branch_revision': get_branch_revision,
     'create_branch': create_branch,
@@ -400,6 +431,7 @@ operations = {
     'update_clone_repository': update_clone_repository,
     'push_repository': push_repository,
     'create_pull_request': create_pull_request,
+    'list_pull_request': list_pull_request,
     'add_reviewers': add_reviewers,
     'merge_pull_request': merge_pull_request,
     'list_review_comments': list_review_comments,
