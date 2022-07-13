@@ -23,15 +23,6 @@
         "description": "The URL of the GitHub to which you will connect and perform the automated operations."
       },
       {
-        "title": "Username",
-        "required": true,
-        "editable": true,
-        "visible": true,
-        "type": "text",
-        "name": "username",
-        "description": "The username used to access the GitHub to which you will connect and perform the automated operations."
-      },
-      {
         "title": "Personal Access Token",
         "required": false,
         "editable": true,
